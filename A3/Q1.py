@@ -67,13 +67,13 @@ def Find_Centroids(k,data,num_iterations):
         pi_k.append(len(indexes[0])/len(data)) 
     return np.array(means),np.array(cov),np.array(pi_k)
 
-def covariance(x,mean,flag=1,r_k=[],N_k=[]):
+def covariance(x,u,flag=1,r_k=[],N_k=[]):
     if flag==0:
         r_k = np.ones(len(x))
         N_k = len(x)
     out = np.zeros((len(x[0]),len(x[0])))
     for i,v in enumerate(x):
-        vec = (v-mean)
+        vec = (v-u)
         vec = vec.reshape((len(vec),1))
         out += r_k[i] * np.dot((vec),vec.T)
     return 1/N_k * out
@@ -82,7 +82,7 @@ def Normal_distribution(x,u,E):     #TO DO : Make this more efficient
     E_inv = np.linalg.inv(E)
     x_m = x-u
     x_m = x_m.reshape((len(x_m),1))
-    exp_arg = -1/2 * np.dot(np.dot(x_m.T,E_inv),x_m)
+    exp_arg = -1/2 * np.dot(np.dot(x_m.T,E_inv),x_m)[0][0]
     gaus = 1/pow(2*np.pi,len(x)/2)/np.sqrt(np.linalg.det(E)) * np.exp(exp_arg)
     return gaus
 
@@ -101,14 +101,15 @@ def gmm(data,k,pi_k,mean,cov,no_of_iterations=10):
         for j in range(k):
             N_k = sum(r_nk[:,j])
             pi_k[j] = N_k/N
-            # new_mean[j] = sum((data.T*r_nk[:,j]).T)/N_k
-            new_mean[k] = sum(np.dot(r_nk[:,j],data))/N_k
-            cov[k] = covariance(data,mean[j],1,r_nk[:,j],N_k)
+            new_mean[j] = sum((data.T*r_nk[:,j]).T)/N_k
+            # new_mean[k] = 1/N_k*np.dot(r_nk[:,j].T,data)
+            cov[j] = covariance(data,mean[j],1,r_nk[:,j],N_k)
         mean = new_mean
+        # print(mean,pi_k)
     return mean,cov,pi_k
 
-k=5
+k=3
 means,cov,pi_k = Find_Centroids(k,data_coast,10)
-print(means,cov,pi_k)
-print(gmm(data_coast,k,pi_k,means,cov))
+# print(means,pi_k)
+new_means,new_cov,new_pi_k=gmm(data_coast,k,pi_k,means,cov)
 #print(means)
