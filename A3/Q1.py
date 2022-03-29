@@ -108,8 +108,25 @@ def gmm(data,k,pi_k,mean,cov,no_of_iterations=10):
         # print(mean,pi_k)
     return mean,cov,pi_k
 
+def find_probabiltity(x,mean_k,cov_k,pi_k):
+    pass
+
+def classification(x,means,covs,pi):
+    classify = 0
+    P_max = 0
+    for i in range(len(means)):
+        P_x = find_probabiltity(x,means[i],covs[i],pi[i])
+        if P_x > P_max:
+            P_max = P_x
+            classify = i
+    return classify
+    
+
+
+
+
 k=3
-means,cov,pi_k = Find_Centroids(k,data_coast,10)
+mean,cov,pi_k = Find_Centroids(k,data_coast,10)
 # print(means,pi_k)
-new_means,new_cov,new_pi_k=gmm(data_coast,k,pi_k,means,cov)
+new_mean,new_cov,new_pi_k=gmm(data_coast,k,pi_k,mean,cov)
 #print(means)
