@@ -94,7 +94,6 @@ def gmm(data,k,pi_k,mean,cov,no_of_iterations=10):
             numerators = np.array([pi_k[j] * Normal_distribution(x,mean[j],cov[j]) for j in range(k)])
             denominators = sum(numerators)
             r_nk[i,:] = numerators/denominators
-
         #Maximisation
         new_mean = mean.copy()
         N = len(data)
@@ -108,25 +107,22 @@ def gmm(data,k,pi_k,mean,cov,no_of_iterations=10):
         # print(mean,pi_k)
     return mean,cov,pi_k
 
-def find_probabiltity(x,mean_k,cov_k,pi_k):
-    pass
+def find_probabiltity(x,mean_k,cov_k,pi_k,k):
+    prob = sum([pi_k[j] * Normal_distribution(x,mean_k[j],cov_k[j]) for j in range(k)])
+    return prob
+    
 
-def classification(x,means,covs,pi):
-    classify = 0
+def classification(x,means,covs,pi,k):
     P_max = 0
     for i in range(len(means)):
-        P_x = find_probabiltity(x,means[i],covs[i],pi[i])
+        P_x = find_probabiltity(x,means[i],covs[i],pi[i],k)
         if P_x > P_max:
             P_max = P_x
             classify = i
     return classify
-    
-
-
-
 
 k=3
 mean,cov,pi_k = Find_Centroids(k,data_coast,10)
 # print(means,pi_k)
 new_mean,new_cov,new_pi_k=gmm(data_coast,k,pi_k,mean,cov)
-#print(means)
+# print(means)
