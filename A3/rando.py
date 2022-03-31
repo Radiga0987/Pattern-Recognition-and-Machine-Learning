@@ -18,14 +18,18 @@ import os
 # # print(r_nk)
 # print(data.T *pro)
 
-dir_list = os.listdir('Isolated_Digits//1//train')
-train_1 = []
+# dir_list = os.listdir('Isolated_Digits//1//train')
+# train_1 = []
 
-for file in dir_list:
-    if file.endswith('.mfcc'):
-        with open(r'Isolated_Digits/1/train/'+file) as f:
-            a = f.read().splitlines()
-        for i in range(len(a)):
-            a[i] = [float(s) for s in a[i].split()]
+# for file in dir_list:
+#     if file.endswith('.mfcc'):
+#         with open(r'Isolated_Digits/1/train/'+file) as f:
+#             a = f.read().splitlines()
+#         for i in range(len(a)):
+#             a[i] = [float(s) for s in a[i].split()]
 
-        train_1.append(a)
+#         train_1.append(a)
+
+list = np.array([1,2,3,4,5,6]) 
+print(np.array([list[::2],list[1::2]]).T)
+print(list[::2][0])
