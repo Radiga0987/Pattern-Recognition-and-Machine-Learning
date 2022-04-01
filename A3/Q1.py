@@ -1,36 +1,54 @@
+from cgi import test
 from random import gauss
 import numpy as np
 import os
 
-dir_list = os.listdir('Features//coast//train')
-data_coast = []
-for file in dir_list:
-    data_coast.extend(np.loadtxt('Features/coast/train/'+file))
-data_coast = np.array(data_coast)
+# dir_list = os.listdir('Features//coast//train')
+# data_coast = []
+# for file in dir_list:
+#     data_coast.extend(np.loadtxt('Features/coast/train/'+file))
+# data_coast = np.array(data_coast)
 
-dir_list = os.listdir('Features//forest//train')
-data_forest = []
-for file in dir_list:
-    data_forest.extend(np.loadtxt('Features/forest/train/'+file))
-data_forest = np.array(data_forest)
+# dir_list = os.listdir('Features//forest//train')
+# data_forest = []
+# for file in dir_list:
+#     data_forest.extend(np.loadtxt('Features/forest/train/'+file))
+# data_forest = np.array(data_forest)
 
-dir_list = os.listdir('Features//highway//train')
-data_highway = []
-for file in dir_list:
-    data_highway.extend(np.loadtxt('Features/highway/train/'+file))
-data_highway = np.array(data_highway)
+# dir_list = os.listdir('Features//highway//train')
+# data_highway = []
+# for file in dir_list:
+#     data_highway.extend(np.loadtxt('Features/highway/train/'+file))
+# data_highway = np.array(data_highway)
 
-dir_list = os.listdir('Features//mountain//train')
-data_mountain = []
-for file in dir_list:
-    data_mountain.extend(np.loadtxt('Features/mountain/train/'+file))
-data_mountain = np.array(data_mountain)
+# dir_list = os.listdir('Features//mountain//train')
+# data_mountain = []
+# for file in dir_list:
+#     data_mountain.extend(np.loadtxt('Features/mountain/train/'+file))
+# data_mountain = np.array(data_mountain)
 
-dir_list = os.listdir('Features//opencountry//train')
-data_opencountry = []
-for file in dir_list:
-    data_opencountry.extend(np.loadtxt('Features/opencountry/train/'+file))
-data_opencountry = np.array(data_opencountry)
+# dir_list = os.listdir('Features//opencountry//train')
+# data_opencountry = []
+# for file in dir_list:
+#     data_opencountry.extend(np.loadtxt('Features/opencountry/train/'+file))
+# data_opencountry = np.array(data_opencountry)
+
+classes = ['coast','forest','highway','mountain','opencountry']
+train = []
+dev = []
+
+for clas in classes:
+    lst = []
+    dir_list = os.listdir('Features//'+clas+'//train')
+    for file in dir_list:
+        lst.extend(np.loadtxt('Features/'+clas+'/train/' + file))
+    train.append(np.array(lst))
+
+    lst = []
+    dir_list = os.listdir('Features//'+clas+'//dev')
+    for file in dir_list:
+        lst.extend(np.loadtxt('Features/'+clas+'/dev/' + file))
+    dev.append(np.array(lst))
 
 def Euclidean_Distance(v1,v2):
     d = np.sqrt(sum((v1-v2)**2))
@@ -111,7 +129,7 @@ def Normal_distribution(x,u,E):     #TO DO : Make this more efficient
     v1 = pow(2*np.pi,len(x)/2)
     v2 = np.sqrt(np.linalg.det(E))
     v3 = np.exp(exp_arg)
-    gaus = 1/pow(2*np.pi,len(x)/2)/np.sqrt(np.linalg.det(E)) * np.exp(exp_arg)
+    gaus = 1/pow(2*np.pi,len(x)/2)/np.sqrt(abs(np.linalg.det(E))) * np.exp(exp_arg)
     return gaus
 
 def gmm(data,k,pi_k,mean,cov,no_of_iterations=10):
@@ -132,7 +150,6 @@ def gmm(data,k,pi_k,mean,cov,no_of_iterations=10):
             # new_mean[k] = 1/N_k*np.dot(r_nk[:,j].T,data)
             cov[j] = covariance(data,mean[j],1,r_nk[:,j],N_k)
         mean = new_mean
-        print(pi_k)
     return mean,cov,pi_k
 
 def find_probabiltity(x,mean_k,cov_k,pi_k,k):
@@ -156,15 +173,15 @@ def classification(x,means,covs,pi,k):
 
 means,covs,pi = [],[],[]
 k=2
-mean,cov,pi_k = Find_Centroids(k,data_coast,10)
-# print(means,pi_k)
-print(pi_k)
-new_mean,new_cov,new_pi_k=gmm(data_coast,k,pi_k,mean,cov,2)
-# print(means)
-means.append(new_mean)
-covs.append(new_cov)
-pi.append(new_pi_k)
-print("trained")
+# mean,cov,pi_k = Find_Centroids(k,data_coast,10)
+# # print(means,pi_k)
+# print(pi_k)
+# new_mean,new_cov,new_pi_k=gmm(data_coast,k,pi_k,mean,cov,2)
+# # print(means)
+# means.append(new_mean)
+# covs.append(new_cov)
+# pi.append(new_pi_k)
+# print("trained")
 
 # mean,cov,pi_k = Find_Centroids(k,data_forest,10)
 # new_mean,new_cov,new_pi_k=gmm(data_forest,k,pi_k,mean,cov)
@@ -194,10 +211,18 @@ print("trained")
 # pi.append(new_pi_k)
 # print("trained")
 
-dir_list = os.listdir('Features//coast//dev')
-data_test_coast = []
-for file in [dir_list[0]]:
-    data_test_coast.extend(np.loadtxt('Features/coast/dev/'+file))
-data_test_coast = np.array(data_test_coast)
+# dir_list = os.listdir('Features//coast//dev')
+# data_test_coast = []
+# for file in [dir_list[0]]:
+#     data_test_coast.extend(np.loadtxt('Features/coast/dev/'+file))
+# data_test_coast = np.array(data_test_coast)
 
-print(classification(data_test_coast,means,covs,pi,k))
+for clas_data in train:
+    mean,cov,pi_k = Find_Centroids(k,clas_data,10)
+    new_mean,new_cov,new_pi_k=gmm(clas_data,k,pi_k,mean,cov,2)
+    means.append(new_mean)
+    covs.append(new_cov)
+    pi.append(new_pi_k)
+    print("trained")
+
+print(classification(dev[0],means,covs,pi,k))
