@@ -30,6 +30,10 @@ import os
 
 #         train_1.append(a)
 
-list = np.array([1,2,3,4,5,6]) 
-print(np.array([list[::2],list[1::2]]).T)
-print(list[::2][0])
+# list = np.array([1,2,3,4,5,6]) 
+# print(np.array([list[::2],list[1::2]]).T)
+# print(list[::2][0])
+
+a = 2*np.pi
+print(pow(2*np.pi,3/2))
+print(np.sqrt(a**3))
