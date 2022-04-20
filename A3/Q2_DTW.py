@@ -132,6 +132,8 @@ def ROC_DET(S,ground_truth,label ="DTW ROC curve"):
     plt.show()
 
     #DET
+    #Makes use of an inbuilt library - sklearn.metrics.det_curve
+    #y_true - 1D array of length(no of class * len(dev_data))
     y_true = []
     for i in range(5):
         for j in range(len(ground_truth)):
@@ -146,6 +148,7 @@ def ROC_DET(S,ground_truth,label ="DTW ROC curve"):
         y_true = np.array(y_true)
         fpr, fnr, thresholds = det_curve(y_true, S)
         plt.plot(fpr,fnr,label=label)
+        plt.plot(fpr,fnr,label="Case "+str(i+1))
         plt.yscale('logit')
         plt.xscale('logit')
     plt.legend()
@@ -193,6 +196,28 @@ print("The class predictions by DTW for Isolated digits is ",predicted_classes)
 Confusion_matrix(predicted_classes,"DTW on Digits")
 ROC_DET(np.array(scores),ground_truth,"DTW on Digits")
 
+for digit in digits:
+    lst = []
+    dir_list = os.listdir('Isolated_Digits//'+str(digit)+'//train')
+    for file in dir_list:
+        if file.endswith('.mfcc'):
+            lst.append(np.loadtxt('Isolated_Digits/'+str(digit)+'/train/' + file,skiprows = 1))
+
+    train.append(lst)
+
+    lst = []
+    dir_list = os.listdir('Isolated_Digits//'+str(digit)+'//dev')
+    for file in dir_list:
+        if file.endswith('.mfcc'):
+            lst.append(np.loadtxt('Isolated_Digits/'+str(digit)+'/dev/' + file,skiprows = 1))
+
+    dev.append(lst)
+t=time.time()
+print("Classifying all dev data for Isolated Digits")
+predicted_classes,Accuracy,scores = DTW_Classify(train,dev)
+Confusion_matrix(predicted_classes)
+ROC_DET(np.array(scores),[1,2,3,4,5])#[1]*len(dev[0])+[2]*len(dev[1])+[3]*len(dev[2])+[4]*len(dev[3])+[5]*len(dev[4]),"DTW for digits")
+print(time.time()-t)
 
 ###########################################################################
 
