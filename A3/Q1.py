@@ -83,6 +83,7 @@ def Normal_distribution(x,u,E):     #TO DO : Make this more efficient
     x_m = x-u
     x_m = x_m.reshape((len(x_m),1))
     exp_arg = -1/2 * np.dot(np.dot(x_m.T,E_inv),x_m)[0][0]
+    det= np.linalg.det(E)
     gaus = 1/pow(2*np.pi,len(x)/2)/np.sqrt(np.linalg.det(E)) * np.exp(exp_arg)
     return gaus
 
