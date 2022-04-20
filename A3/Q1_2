@@ -519,15 +519,15 @@ def partB(k= 15, km_num_iterations = 10, gmm_num_iterations = 4, flag_diag=0):
     return(S,class_labels)
 
 S_list = []
-S_,class_labels_b = partA(k=25, km_num_iterations = 30, gmm_num_iterations = 10,flag_diag=0)
+S_,class_labels_b = partA(k=15, km_num_iterations = 30, gmm_num_iterations = 4,flag_diag=0)
 S_list.append(S_)
-S_,class_labels_b = partA(k=25, km_num_iterations = 30, gmm_num_iterations = 10,flag_diag=1)
+S_,class_labels_b = partA(k=15, km_num_iterations = 30, gmm_num_iterations = 4,flag_diag=1)
 S_list.append(S_)
 ROC_DET(S_list,class_labels_b,"Image_Dataset")
 
 S_list = []
-S_,class_labels_b = partB(k=25, km_num_iterations = 13, gmm_num_iterations = 10, flag_diag=0)
-S_list.append(S_)
-S_,class_labels_b = partB(k=25, km_num_iterations = 13, gmm_num_iterations = 10, flag_diag=1)
-S_list.append(S_)
-ROC_DET(S_list,class_labels_b,"Synthetic_Dataset")
+# S_,class_labels_b = partB(k=25, km_num_iterations = 13, gmm_num_iterations = 10, flag_diag=0)
+# S_list.append(S_)
+# S_,class_labels_b = partB(k=25, km_num_iterations = 13, gmm_num_iterations = 10, flag_diag=1)
+# S_list.append(S_)
+# ROC_DET(S_list,class_labels_b,"Synthetic_Dataset")

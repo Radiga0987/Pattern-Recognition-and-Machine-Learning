@@ -34,6 +34,13 @@ import os
 # print(np.array([list[::2],list[1::2]]).T)
 # print(list[::2][0])
 
-a = 2*np.pi
-print(pow(2*np.pi,3/2))
-print(np.sqrt(a**3))
+# a = 2*np.pi
+# print(pow(2*np.pi,3/2))
+# print(np.sqrt(a**3))
+
+a = np.array([[1,2,3]])
+b = np.array([[2,1,3],[8,4,5]])
+print(np.argmax(b[1]))
+
+a = np.array([[1,25,3],[17,2,43]])
+print(np.max(a,axis=0))
