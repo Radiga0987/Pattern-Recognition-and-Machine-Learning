@@ -1,7 +1,6 @@
 import numpy as np
 import os
 import time
-from sklearn.decomposition import PCA
 from scipy import signal
 import math
 
@@ -38,7 +37,7 @@ def KNN_Synthetic(K,train_data,train_labels,dev_data,dev_labels):
         if predictions[i] == dev_labels[i]:
             count_correct += 1
     acc = count_correct/len(dev_data)
-    print("Accuracy on dev data of synthetic dataset using KNN  =",acc)
+    print("Accuracy on dev data of synthetic dataset using KNN  =",acc * 100,"%")
     return acc
 
 def KNN_Images(K,train_imgs,train_labels,dev_imgs,dev_labels):
@@ -49,7 +48,7 @@ def KNN_Images(K,train_imgs,train_labels,dev_imgs,dev_labels):
         if predictions[i] == dev_labels[i]:
             count_correct += 1
     acc = count_correct/len(dev_labels)
-    print("Accuracy on dev data of image dataset using KNN  =",acc)
+    print("Accuracy on dev data of image dataset using KNN  =",acc * 100,"%")
     return acc
 
 def KNN_Isolated_digits(K,train_ext,train_labels,dev_ext,dev_labels):
@@ -60,7 +59,7 @@ def KNN_Isolated_digits(K,train_ext,train_labels,dev_ext,dev_labels):
         if predictions[i] == dev_labels[i]:
             count_correct += 1
     acc = count_correct/len(dev_labels)
-    print("Accuracy on dev data of isolated digits dataset using KNN  =",acc)
+    print("Accuracy on dev data of isolated digits dataset using KNN  =",acc * 100,"%")
     return acc
 
 def KNN_Telugu_chars(K,train_ext,train_labels,dev_ext,dev_labels):
@@ -71,7 +70,7 @@ def KNN_Telugu_chars(K,train_ext,train_labels,dev_ext,dev_labels):
         if predictions[i] == dev_labels[i]:
             count_correct += 1
     acc = count_correct/len(dev_labels)
-    print("Accuracy on dev data of Telugu characters using KNN  =",acc)
+    print("Accuracy on dev data of Telugu characters using KNN  =",acc * 100,"%")
     return acc
 
 ##########################################
@@ -134,14 +133,9 @@ denoms = maxs - mins
 train_imgs = (train_imgs-mean_train)/denoms
 dev_imgs = (dev_imgs-mean_train)/denoms
 
-#Principal Component Analysis, for reducing Dimensionality
-# pca = PCA(.99)
-# pca.fit(np.array(train_imgs))
-# train_imgs = pca.transform(train_imgs)
-# dev_imgs = pca.transform(dev_imgs)
-
 train_imgs = np.array(train_imgs)
 dev_imgs = np.array(dev_imgs)
+
 
 KNN_Images(15,train_imgs,train_img_label,dev_imgs,dev_img_label)
 
@@ -220,21 +214,10 @@ for i in range(len(dev_all)):
         lst.extend(dev_all[i][j])
     dev_extended.append(np.array(lst))
 
-
-#Principal Component Analysis, for reducing Dimensionality
-# pca = PCA(0.99)
-# pca.fit(np.array(train_extended))
-# train_extended = pca.transform(train_extended)
-# dev_extended = pca.transform(dev_extended)
-
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
 
 KNN_Isolated_digits(7,train_extended,train_labels,dev_extended,dev_labels)
-
-
-
-
 
 
 ############################################
@@ -334,13 +317,9 @@ for i in range(len(dev_all)):
         lst.extend(dev_all[i][j])
     dev_extended.append(np.array(lst))
 
-#Principal Component Analysis, for reducing Dimensionality
-# pca = PCA(0.9)
-# pca.fit(np.array(train_extended))
-# train_extended = pca.transform(train_extended)
-# dev_extended = pca.transform(dev_extended)
 
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
+
 
 KNN_Telugu_chars(20,train_extended,train_labels,dev_extended,dev_labels)

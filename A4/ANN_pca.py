@@ -1,8 +1,11 @@
 from sklearn.neural_network import MLPClassifier
 import numpy as np
 import os
+import time
+from sklearn.decomposition import PCA
 from scipy import signal
 import math
+from pca_lda_ import pca_,lda_,transform
 
 #########################
 #Synthetic data
@@ -77,9 +80,18 @@ train_imgs = (train_imgs-mean_train)/denoms
 dev_imgs = (dev_imgs-mean_train)/denoms
 
 
+#Principal Component Analysis, for reducing Dimensionality
+# pca = PCA(.7)
+# pca.fit(np.array(train_imgs))
+# train_imgs = pca.transform(train_imgs)
+# dev_imgs = pca.transform(dev_imgs)
+
 train_imgs = np.array(train_imgs)
 dev_imgs = np.array(dev_imgs)
 
+Q = pca_(train_imgs,.7)
+train_imgs = transform(Q,train_imgs)
+dev_imgs = transform(Q,dev_imgs)
 
 clf = MLPClassifier(solver='adam', activation="relu",alpha=2.7,hidden_layer_sizes=(128,64,32), random_state=1, max_iter = 5000)
 clf.fit(train_imgs, train_img_label)
@@ -165,10 +177,18 @@ for i in range(len(dev_all)):
         lst.extend(dev_all[i][j])
     dev_extended.append(np.array(lst))
 
+#Principal Component Analysis, for reducing Dimensionality
+# pca = PCA(0.99)
+# pca.fit(np.array(train_extended))
+# train_extended = pca.transform(train_extended)
+# dev_extended = pca.transform(dev_extended)
 
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
 
+Q = pca_(train_extended,.99)
+train_extended = transform(Q,train_extended)
+dev_extended = transform(Q,dev_extended)
 
 clf = MLPClassifier(solver='adam', activation="tanh",alpha=1,hidden_layer_sizes=(30,30), random_state=1, max_iter = 5000)
 clf.fit(train_extended, train_labels)
@@ -278,10 +298,18 @@ for i in range(len(dev_all)):
         lst.extend(dev_all[i][j])
     dev_extended.append(np.array(lst))
 
+#Principal Component Analysis, for reducing Dimensionality
+# pca = PCA(0.999)
+# pca.fit(np.array(train_extended))
+# train_extended = pca.transform(train_extended)
+# dev_extended = pca.transform(dev_extended)
 
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
 
+Q = pca_(train_extended,.9)
+train_extended = transform(Q,train_extended)
+dev_extended = transform(Q,dev_extended)
 
 clf = MLPClassifier(solver='adam', activation="tanh",alpha=2,hidden_layer_sizes=(100,50), random_state=1, max_iter = 5000)
 clf.fit(train_extended, train_labels)

@@ -1,36 +1,76 @@
+from sklearn.neural_network import MLPClassifier
 import numpy as np
 import os
-import time
-from sklearn.decomposition import PCA
 from scipy import signal
 import math
+from pca_lda_ import pca_,lda_,transform
+
+#########################
+#Image Dataset
+
+classes = ['coast','forest','highway','mountain','opencountry']
+
+train_imgs = []
+dev_imgs = []
+dev_img_label= []
+train_img_label= []
 
 
-def get_dist_to_points(train,dev):
-    dev_square = np.sum(np.square(dev),axis=1,keepdims=1)
-    b = np.ones((1,train.shape[0]))
-    dists = dev_square.dot(b)
-    dev_square = np.ones((dev.shape[0],1))
-    b = np.sum(np.square(train),axis=1,keepdims=1).T
-    dists += dev_square.dot(b)
-    dists -= 2*dev.dot(train.T)
-    dists = np.sqrt(dists)
-    return dists
+#Reading the Images of each class for train and Developement DataSets
+for i,cls in enumerate(classes):
+    dir_list = os.listdir('Features//'+cls+'//train')
+    for file in dir_list:
+        concat = np.array([])
+        for r in np.loadtxt('Features/'+cls+'/train/' + file):
+            concat = np.concatenate((concat,r))
+        train_imgs.append(concat)
+        train_img_label.extend([i])
 
-def predict_KNN(train,train_labels,dev,k):
-    dists_matrix = get_dist_to_points(train,dev)
-    indices = np.argpartition(dists_matrix, k-1, axis=1)[:, :k]
+    dir_list = os.listdir('Features//'+cls+'//dev')
+    for file in dir_list:
+        concat = np.array([])
+        for r in np.loadtxt('Features/'+cls+'/dev/' + file):
+            concat = np.concatenate((concat,r))
+        dev_imgs.append(concat)
+        dev_img_label.extend([i])
 
-    predictions = []
-    for i in range(len(indices)):
-            count_k = [0]*len(set(train_labels))
-            for j in range(k):
-                count_k[train_labels[indices[i][j]]] += 1
-            
-            predictions.append(count_k.index(max(count_k)))
-    return predictions
+#Mean Normalisation
+mean_train = np.mean(train_imgs,axis=0)
+maxs = np.max(train_imgs,axis=0)
+mins = np.min(train_imgs,axis=0)
+denoms = maxs - mins
+train_imgs = (train_imgs-mean_train)/denoms
+dev_imgs = (dev_imgs-mean_train)/denoms
 
-# Isolated Digits
+train_imgs = np.array(train_imgs)
+dev_imgs = np.array(dev_imgs)
+
+Q = lda_(train_imgs,train_img_label,.99)
+train_imgs = transform(Q,train_imgs)
+dev_imgs = transform(Q,dev_imgs)
+
+mean_train = np.mean(train_imgs,axis=0)
+maxs = np.max(train_imgs,axis=0)
+mins = np.min(train_imgs,axis=0)
+denoms = maxs - mins
+train_imgs = (train_imgs-mean_train)/denoms
+dev_imgs = (dev_imgs-mean_train)/denoms
+
+clf = MLPClassifier(solver='adam', activation="relu",alpha=2.7,hidden_layer_sizes=(128,64,32), random_state=1, max_iter = 5000)
+clf.fit(train_imgs, train_img_label)
+
+predictions = clf.predict(dev_imgs)
+count_correct = 0
+for i in range(len(predictions)):
+    if predictions[i] == dev_img_label[i]:
+        count_correct += 1
+print("Accuracy on dev data of Image dataset using ANN  =",count_correct/len(dev_img_label))
+
+
+
+
+#########################
+# Isolated digits
 digits = [1,2,5,9,'z']
 train = []
 dev = []
@@ -59,12 +99,13 @@ for cls in range(len(train)):
     for i in range(len(train[cls])):
         num_frames += len(train[cls][i])
         count += 1
+
 avg_num_frames = math.floor(num_frames/count)
-avg_num_frames = 200
 train_all = []
 dev_all = []
 train_labels = []
 dev_labels = []
+
 for cls in range(len(train)):
     for i in range(len(train[cls])):
         train_all.append(signal.resample(train[cls][i],avg_num_frames))
@@ -100,28 +141,32 @@ for i in range(len(dev_all)):
     dev_extended.append(np.array(lst))
 
 
-#Principal Component Analysis, for reducing Dimensionality
-pca = PCA(0.99)
-pca.fit(np.array(train_extended))
-train_extended = pca.transform(train_extended)
-dev_extended = pca.transform(dev_extended)
-
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
 
-def KNN_Isolated_digits(K):
-    predictions = predict_KNN(train_extended,train_labels,dev_extended,K)
-    count_correct = 0
-    for i in range(len(predictions)):
-        #print(predictions[i],dev_labels[i])
-        if predictions[i] == dev_labels[i]:
-            count_correct += 1
-    print(count_correct/len(dev_labels))
+Q = lda_(train_extended,train_labels,.99)
+train_extended = transform(Q,train_extended)
+dev_extended = transform(Q,dev_extended)
 
-KNN_Isolated_digits(7)
+mean_train = np.mean(train_extended,axis=0)
+maxs = np.max(train_extended,axis=0)
+mins = np.min(train_extended,axis=0)
+denoms = maxs - mins
+train_all = (train_extended-mean_train)/denoms
+dev_extended = (dev_extended-mean_train)/denoms
+
+clf = MLPClassifier(solver='adam', activation="tanh",alpha=1,hidden_layer_sizes=(30,30), random_state=1, max_iter = 5000)
+clf.fit(train_extended, train_labels)
+
+predictions = clf.predict(dev_extended)
+count_correct = 0
+for i in range(len(predictions)):
+    if predictions[i] == dev_labels[i]:
+        count_correct += 1
+print("Accuracy on dev data of Isolated digits using ANN  =",count_correct/len(dev_labels))
 
 
-
+######################################
 
 # Handwriting Data
 letters = ['a','bA','chA','lA','tA']
@@ -204,7 +249,6 @@ denoms = maxs - mins
 train_all = (train_all-mean_train)/denoms
 dev_all = (dev_all-mean_train)/denoms
 
-
 train_extended = []
 dev_extended = []
 for i in range(len(train_all)):
@@ -219,28 +263,27 @@ for i in range(len(dev_all)):
         lst.extend(dev_all[i][j])
     dev_extended.append(np.array(lst))
 
-#Principal Component Analysis, for reducing Dimensionality
-# pca = PCA(0.9)
-# pca.fit(np.array(train_extended))
-# train_extended = pca.transform(train_extended)
-# dev_extended = pca.transform(dev_extended)
 
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
-print(dev_labels)
-def KNN_Telugu_chars(K):
-    predictions = predict_KNN(train_extended,train_labels,dev_extended,K)
-    count_correct = 0
-    for i in range(len(predictions)):
-        #print(predictions[i],dev_labels[i])
-        if predictions[i] == dev_labels[i]:
-            count_correct += 1
-    print(count_correct/len(dev_labels))
 
-KNN_Telugu_chars(5)
-KNN_Telugu_chars(10)
-KNN_Telugu_chars(12)
-KNN_Telugu_chars(15)
-KNN_Telugu_chars(20)
-KNN_Telugu_chars(30)
-KNN_Telugu_chars(50)
+Q = lda_(train_extended,train_labels,.99)
+train_extended = transform(Q,train_extended)
+dev_extended = transform(Q,dev_extended)
+
+mean_train = np.mean(train_extended,axis=0)
+maxs = np.max(train_extended,axis=0)
+mins = np.min(train_extended,axis=0)
+denoms = maxs - mins
+train_all = (train_extended-mean_train)/denoms
+dev_extended = (dev_extended-mean_train)/denoms
+
+clf = MLPClassifier(solver='adam', activation="tanh",alpha=2,hidden_layer_sizes=(100,50), random_state=1, max_iter = 5000)
+clf.fit(train_extended, train_labels)
+
+predictions = clf.predict(dev_extended)
+count_correct = 0
+for i in range(len(predictions)):
+    if predictions[i] == dev_labels[i]:
+        count_correct += 1
+print("Accuracy on dev data of Telugu characters using ANN  =",count_correct/len(dev_labels))
