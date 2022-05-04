@@ -530,7 +530,7 @@ def Handwriting_Data():
     ROC_DET([scores],dev_labels,"Handwritten")
 
 #Logistic Regression on the datasets.
-Synth()
+# Synth()
 Image_Dataset()
 spoken_digits()
 Handwriting_Data()

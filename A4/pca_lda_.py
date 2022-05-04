@@ -23,6 +23,8 @@ def pca_(data,L):
     return V[:,:i+1]
 
 def lda_(X, y, Per):
+    if X.shape[1] >3000:
+        return pca_(X,Per)
     n_features = X.shape[1]
     class_labels = np.unique(y)
 
@@ -39,16 +41,13 @@ def lda_(X, y, Per):
         mean_diff = mean_diff.reshape((len(mean_diff),1))
         SB += n_c * np.dot(mean_diff,mean_diff.T)
     
-    
     # A = np.linalg.inv(SW).dot(SB)
     A = np.linalg.solve(SW,SB)
 
     e, V = scipy.linalg.eig(SW, SB)    
-    
     idxs = np.argsort(abs(e))[::-1]
     e = e[idxs]
     V = V[idxs]
-    # mag,e,V = map(np.array, zip(*sorted(zip(abs(e),e,V.T),reverse=True)))      #Sorting
  
     V=V.T
     eigenvectors = V

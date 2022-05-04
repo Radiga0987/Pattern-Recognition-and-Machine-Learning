@@ -151,8 +151,7 @@ for i in range(len(X)):
         count+=1
 Space = np.array(Space)
 
-y_pred = clf.predict(Space)
-print(y_pred)
+y_pred = 1+clf.predict(Space)
 val_ = y_pred.reshape(500,500)
 
 plt.figure(figsize=(7,7))

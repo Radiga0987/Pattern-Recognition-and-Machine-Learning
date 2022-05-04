@@ -1,8 +1,10 @@
 import numpy as np
 import os
-import time
 from scipy import signal
 import math
+import matplotlib.pyplot as plt
+from sklearn.metrics import det_curve
+from sklearn.preprocessing import StandardScaler
 
 
 def get_dist_to_points(train,dev):
@@ -21,57 +23,195 @@ def predict_KNN(train,train_labels,dev,k):
     indices = np.argpartition(dists_matrix, k-1, axis=1)[:, :k]
 
     predictions = []
+    scores = []
     for i in range(len(indices)):
             count_k = [0]*len(set(train_labels))
             for j in range(k):
                 count_k[train_labels[indices[i][j]]] += 1
             
             predictions.append(count_k.index(max(count_k)))
-    return predictions
+            scores.append(count_k)
+    scores = np.array(scores)
+    scores = scores/k
+    return predictions,scores
 
 def KNN_Synthetic(K,train_data,train_labels,dev_data,dev_labels):
-    predictions = predict_KNN(train_data,train_labels,dev_data,K)
+    predictions,scores = predict_KNN(train_data,train_labels,dev_data,K)
 
+    conf_matrix = np.zeros((2,2))
     count_correct = 0
     for i in range(len(predictions)):
         if predictions[i] == dev_labels[i]:
             count_correct += 1
+        conf_matrix[int(dev_class_labels[i])][int(predictions[i])] += 1
+    confusion_matrix(conf_matrix,"Synthetic Dataset - KNN")
+    
     acc = count_correct/len(dev_data)
     print("Accuracy on dev data of synthetic dataset using KNN  =",acc * 100,"%")
+    ROC_DET([scores],np.array(dev_labels)+1,"Synthetic Data")
+
+    # class1,class2=[],[]
+    # for i in range(len(train_data)):
+    #     if train_class_labels[i]==0:
+    #         class1.append(train_data[i])
+    #     if train_class_labels[i]==1:
+    #         class2.append(train_data[i])
+    # class1=np.array(class1)
+    # class2=np.array(class2)
+
+    # #Decision Boundary Plot
+    # x1_ = np.linspace(-17, 17,500)
+    # x2_ = np.linspace(-17, 17,500)
+    # X,Y = np.meshgrid(x1_,x2_)
+    # Space = [[] for i in range(len(X)*len(X))]
+    # count = 0
+    # for i in range(len(X)):
+    #     for j in range(len(X[0])):
+    #         Space[count] = [X[i][j],Y[i][j]]
+    #         count+=1
+    # Space = np.array(Space)
+
+    # y_pred,score = predict_KNN(train_data,train_labels,Space,K)
+    # y_pred += 1
+    # val_ = y_pred.reshape(100,100)
+
+    # plt.figure(figsize=(7,7))
+    # ax = plt.subplot()
+    # ax.plot(class1[:,0],class1[:,1],'.',label="Class1  - yellow")
+    # ax.plot(class2[:,0],class2[:,1],'.',label="Class2 - red")
+    # c = ax.contourf(X, Y, val_,cmap='YlOrRd',levels=[0,1,2])
+    # plt.show()
     return acc
 
 def KNN_Images(K,train_imgs,train_labels,dev_imgs,dev_labels):
-    predictions = predict_KNN(train_imgs,train_labels,dev_imgs,K)
+    predictions,scores = predict_KNN(train_imgs,train_labels,dev_imgs,K)
 
     count_correct = 0
+    conf_matrix = np.zeros((5,5))
     for i in range(len(predictions)):
         if predictions[i] == dev_labels[i]:
             count_correct += 1
+        conf_matrix[int(dev_img_label[i])][int(predictions[i])] += 1
+    confusion_matrix(conf_matrix,"Image Dataset - KNN")
+
     acc = count_correct/len(dev_labels)
     print("Accuracy on dev data of image dataset using KNN  =",acc * 100,"%")
+    ROC_DET([scores],np.array(dev_labels)+1,"Image Dataset")
     return acc
 
 def KNN_Isolated_digits(K,train_ext,train_labels,dev_ext,dev_labels):
-    predictions = predict_KNN(train_ext,train_labels,dev_ext,K)
+    predictions,scores = predict_KNN(train_ext,train_labels,dev_ext,K)
 
     count_correct = 0
+    conf_matrix = np.zeros((5,5))
     for i in range(len(predictions)):
         if predictions[i] == dev_labels[i]:
             count_correct += 1
+        conf_matrix[int(dev_labels[i])][int(predictions[i])] += 1
+    confusion_matrix(conf_matrix,"Isolated Digits Dataset KNN")
+
     acc = count_correct/len(dev_labels)
     print("Accuracy on dev data of isolated digits dataset using KNN  =",acc * 100,"%")
+    ROC_DET([scores],np.array(dev_labels)+1,"Spoken Digits")
     return acc
 
 def KNN_Telugu_chars(K,train_ext,train_labels,dev_ext,dev_labels):
-    predictions = predict_KNN(train_ext,train_labels,dev_ext,K)
+    predictions,scores = predict_KNN(train_ext,train_labels,dev_ext,K)
 
     count_correct = 0
+    conf_matrix = np.zeros((5,5))
     for i in range(len(predictions)):
         if predictions[i] == dev_labels[i]:
             count_correct += 1
+        conf_matrix[int(dev_labels[i])][int(predictions[i])] += 1
+    confusion_matrix(conf_matrix,"Telugu Characters - KNN")
+
     acc = count_correct/len(dev_labels)
     print("Accuracy on dev data of Telugu characters using KNN  =",acc * 100,"%")
+    ROC_DET([scores],np.array(dev_labels)+1,"Telugu Characters")
     return acc
+
+#ROC and DET
+def ROC_DET(S_list,class_labels,Title=""):
+    temp = [] 
+
+    for score in S_list:
+        sc_x = StandardScaler()
+        score = sc_x.fit_transform(score)
+        # for i in range(len(score[0])):
+        #     sc_x = StandardScaler()
+        #     score[:,i] = sc_x.fit_transform(score[:,i])
+        temp.append(score)
+    S_list = temp
+    #ROC
+    Scores_list = []
+    for case_no in range(len(S_list)):  #For Loop for all cases
+        S = S_list[case_no]
+        S = np.array(S)
+        Scores = sorted(S.flatten())   #Scores are sorted for thresholding
+        Scores_list.append(S.T.flatten())
+        
+        TPR = [0]*len(Scores)   
+        FPR = [0]*len(Scores) 
+        count=0
+        for threshold in Scores:
+            TP,FP,TN,FN = 0,0,0,0
+            for i in range(len(S)):
+                for j in range(len(S[0])):
+                    if S[i][j] >= threshold:        #Classifying As Positive
+                        if class_labels[i] == j+1: TP+=1
+                        else:   FP+=1
+                    else:
+                        if class_labels[i] == j+1: FN+=1
+                        else:   TN+=1
+            TPR[count] = TP/(TP+FN)     #True Positive Rate
+            FPR[count] = FP/(FP+TN)     #False Positive Rate
+
+            count+=1
+        plt.plot(FPR,TPR,label="Case "+str(case_no+1))
+    plt.xlabel("False Postive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.legend(loc="lower right")
+    plt.title("Receiver Operating Characteristic curve "+Title)
+    plt.show()
+
+    #DET
+    #Makes use of an inbuilt library - sklearn.metrics.det_curve
+    #y_true - 1D array of length(no of class * len(dev_data))
+    y_true = [0]*(len(S_list[0][0])*len(class_labels))
+    count = 0
+    for i in range(len(S[0])):
+        for j in range(len(class_labels)):
+            if class_labels[j] == i+1:
+                y_true[count]=1
+            count += 1
+    plt.figure(figsize=(8,5))  
+
+    #Plotting DET Curve for All Cases
+    for i in range(len(S_list)):
+        S = Scores_list[i]
+        y_true = np.array(y_true)
+        fpr, fnr, thresholds = det_curve(y_true, S)
+        plt.plot(fpr,fnr,label="Case "+str(i+1))
+        plt.yscale('logit')
+        plt.xscale('logit')
+    plt.legend()
+    plt.xlabel("False Postive Rate")
+    plt.ylabel("False Negative Rate")
+    plt.title("Detection Error Tradeoff curve "+Title)
+    plt.show()
+
+#Confusion Matrix
+def confusion_matrix(conf_matrix,Title=""):
+    fig, ax = plt.subplots(figsize=(5,5))
+    ax.matshow(conf_matrix, cmap=plt.cm.Blues, alpha=0.6)
+    for i in range(conf_matrix.shape[0]):
+        for j in range(conf_matrix.shape[1]):
+            ax.text(x=j, y=i,s=conf_matrix[i, j], va='center', ha='center', size='large')
+    plt.xlabel('Predictions', fontsize=14)
+    plt.ylabel('True', fontsize=14)
+    plt.title(Title, fontsize=12)
+    plt.show()
 
 ##########################################
 # Synthetic data
