@@ -5,7 +5,8 @@ from scipy import signal
 import math
 from pca_lda_ import pca_,lda_,transform
 
-
+import warnings
+warnings.filterwarnings("ignore")
 def get_dist_to_points(train,dev):
     dev_square = np.sum(np.square(dev),axis=1,keepdims=1)
     b = np.ones((1,train.shape[0]))
@@ -141,14 +142,6 @@ Q = lda_(train_imgs,train_img_label,.99)
 train_imgs = transform(Q,train_imgs)
 dev_imgs = transform(Q,dev_imgs)
 
-mean_train = np.mean(train_imgs,axis=0)
-maxs = np.max(train_imgs,axis=0)
-mins = np.min(train_imgs,axis=0)
-denoms = maxs - mins
-train_imgs = (train_imgs-mean_train)/denoms
-dev_imgs = (dev_imgs-mean_train)/denoms
-
-
 KNN_Images(15,train_imgs,train_img_label,dev_imgs,dev_img_label)
 
 
@@ -205,13 +198,6 @@ for cls in range(len(dev)):
 train_all = np.array(train_all)
 dev_all = np.array(dev_all)
 
-mean_train = np.mean(train_all,axis=0)
-maxs = np.max(train_all,axis=0)
-mins = np.min(train_all,axis=0)
-denoms = maxs - mins
-train_all = (train_all-mean_train)/denoms
-dev_all = (dev_all-mean_train)/denoms
-
 train_extended = []
 dev_extended = []
 for i in range(len(train_all)):
@@ -229,16 +215,17 @@ for i in range(len(dev_all)):
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
 
-Q = lda_(train_extended,train_labels,.99)
-train_extended = transform(Q,train_extended)
-dev_extended = transform(Q,dev_extended)
-
 mean_train = np.mean(train_extended,axis=0)
 maxs = np.max(train_extended,axis=0)
 mins = np.min(train_extended,axis=0)
 denoms = maxs - mins
 train_all = (train_extended-mean_train)/denoms
 dev_extended = (dev_extended-mean_train)/denoms
+
+Q = lda_(train_extended,train_labels,.99)
+print(Q.shape)
+train_extended = transform(Q,train_extended)
+dev_extended = transform(Q,dev_extended)
 
 KNN_Isolated_digits(7,train_extended,train_labels,dev_extended,dev_labels)
 
@@ -318,14 +305,6 @@ for cls in range(len(dev)):
 train_all = np.array(train_all)
 dev_all = np.array(dev_all)
 
-mean_train = np.mean(train_all,axis=0)
-maxs = np.max(train_all,axis=0)
-mins = np.min(train_all,axis=0)
-denoms = maxs - mins
-train_all = (train_all-mean_train)/denoms
-dev_all = (dev_all-mean_train)/denoms
-
-
 train_extended = []
 dev_extended = []
 for i in range(len(train_all)):
@@ -340,13 +319,8 @@ for i in range(len(dev_all)):
         lst.extend(dev_all[i][j])
     dev_extended.append(np.array(lst))
 
-
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
-
-Q = lda_(train_extended,train_labels,.99)
-train_extended = transform(Q,train_extended)
-dev_extended = transform(Q,dev_extended)
 
 mean_train = np.mean(train_extended,axis=0)
 maxs = np.max(train_extended,axis=0)
@@ -354,5 +328,9 @@ mins = np.min(train_extended,axis=0)
 denoms = maxs - mins
 train_all = (train_extended-mean_train)/denoms
 dev_extended = (dev_extended-mean_train)/denoms
+
+Q = lda_(train_extended,train_labels,.99)
+train_extended = transform(Q,train_extended)
+dev_extended = transform(Q,dev_extended)
 
 KNN_Telugu_chars(20,train_extended,train_labels,dev_extended,dev_labels)

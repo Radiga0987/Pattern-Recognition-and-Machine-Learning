@@ -1,3 +1,5 @@
+
+import scipy
 import numpy as np
 def covariance(x,u):
     N = len(x)-1
@@ -27,30 +29,36 @@ def lda_(X, y, Per):
     mean_overall = np.mean(X, axis=0)
     SW = np.zeros((n_features, n_features))
     SB = np.zeros((n_features, n_features))
+    cov = covariance(X,mean_overall)
     for c in class_labels:
         X_c = X[y == c]
         mean_c = np.mean(X_c, axis=0)
-        SW += (X_c - mean_c).T.dot((X_c - mean_c))
+        SW += X_c.shape[0]*covariance(X_c,mean_c)
         n_c = X_c.shape[0]
         mean_diff = (mean_c - mean_overall).reshape(n_features, 1)
-        SB += n_c * (mean_diff).dot(mean_diff.T)
+        mean_diff = mean_diff.reshape((len(mean_diff),1))
+        SB += n_c * np.dot(mean_diff,mean_diff.T)
     
     
-    A = np.linalg.inv(SW).dot(SB)
+    # A = np.linalg.inv(SW).dot(SB)
+    A = np.linalg.solve(SW,SB)
 
-    eigenvalues, eigenvectors = np.linalg.eig(A)
+    e, V = scipy.linalg.eig(SW, SB)    
     
-    eigenvectors = eigenvectors.T
-    idxs = np.argsort(abs(eigenvalues))[::-1]
-    eigenvalues = eigenvalues[idxs]
-    eigenvectors = eigenvectors[idxs]
-    eigenvectors = eigenvectors.T
+    idxs = np.argsort(abs(e))[::-1]
+    e = e[idxs]
+    V = V[idxs]
+    # mag,e,V = map(np.array, zip(*sorted(zip(abs(e),e,V.T),reverse=True)))      #Sorting
+ 
+    V=V.T
+    eigenvectors = V
+    eigenvalues = e
     # store first n eigenvectors
     for i in range(len(eigenvalues)):
         exp_var = np.sum(eigenvalues[:i+1]) / np.sum(eigenvalues)
         if exp_var > Per:
             break
-    return eigenvectors[:, : i+1]
+    return eigenvectors[:,:i+1]
 
 def transform(Q, X):
     # project data

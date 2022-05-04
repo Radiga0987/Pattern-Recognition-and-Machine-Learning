@@ -5,6 +5,8 @@ from scipy import signal
 import math
 from pca_lda_ import pca_,lda_,transform
 
+import warnings
+warnings.filterwarnings("ignore")
 #########################
 #Image Dataset
 
@@ -119,13 +121,6 @@ for cls in range(len(dev)):
 train_all = np.array(train_all)
 dev_all = np.array(dev_all)
 
-mean_train = np.mean(train_all,axis=0)
-maxs = np.max(train_all,axis=0)
-mins = np.min(train_all,axis=0)
-denoms = maxs - mins
-train_all = (train_all-mean_train)/denoms
-dev_all = (dev_all-mean_train)/denoms
-
 train_extended = []
 dev_extended = []
 for i in range(len(train_all)):
@@ -144,16 +139,16 @@ for i in range(len(dev_all)):
 train_extended = np.array(train_extended)
 dev_extended = np.array(dev_extended)
 
-Q = lda_(train_extended,train_labels,.99)
-train_extended = transform(Q,train_extended)
-dev_extended = transform(Q,dev_extended)
-
 mean_train = np.mean(train_extended,axis=0)
 maxs = np.max(train_extended,axis=0)
 mins = np.min(train_extended,axis=0)
 denoms = maxs - mins
 train_all = (train_extended-mean_train)/denoms
 dev_extended = (dev_extended-mean_train)/denoms
+
+Q = lda_(train_extended,train_labels,.99)
+train_extended = transform(Q,train_extended)
+dev_extended = transform(Q,dev_extended)
 
 clf = MLPClassifier(solver='adam', activation="tanh",alpha=1,hidden_layer_sizes=(30,30), random_state=1, max_iter = 5000)
 clf.fit(train_extended, train_labels)

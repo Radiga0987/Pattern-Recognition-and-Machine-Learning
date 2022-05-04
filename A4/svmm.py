@@ -123,7 +123,7 @@ def Synth():
     conf_matrix = np.zeros((no_classes,no_classes))
     for i in range(len(dev_data)):
         conf_matrix[int(dev_data[:,2][i]-1)][int(y_pred[i]-1)] += 1
-    confusion_matrix(conf_matrix,"Synthetic Dataset Logistic Regression")
+    confusion_matrix(conf_matrix,"Synthetic Dataset SVM")
     
     ROC_DET([scores],dev_data[:,2],"Synthetic")
 
@@ -198,7 +198,7 @@ def Image_Dataset():
     conf_matrix = np.zeros((no_classes,no_classes))
     for i in range(len(dev_labels)):
         conf_matrix[int(dev_labels[i]-1)][int(y_pred[i]-1)] += 1
-    confusion_matrix(conf_matrix,"Image Dataset Logistic Regression")
+    confusion_matrix(conf_matrix,"Image Dataset SVM")
 
     ROC_DET([scores],dev_labels,"Image")
 
@@ -294,7 +294,7 @@ def spoken_digits():
     conf_matrix = np.zeros((no_classes,no_classes))
     for i in range(len(dev_labels)):
         conf_matrix[int(dev_labels[i]-1)][int(y_pred[i]-1)] += 1
-    confusion_matrix(conf_matrix,"Spoken Digits Dataset Logistic Regression")
+    confusion_matrix(conf_matrix,"Spoken Digits Dataset SVM")
 
     ROC_DET([scores],dev_labels,"Spoken digits")
     
@@ -416,7 +416,7 @@ def Handwriting_Data():
     conf_matrix = np.zeros((no_classes,no_classes))
     for i in range(len(dev_labels)):
         conf_matrix[int(dev_labels[i]-1)][int(y_pred[i]-1)] += 1
-    confusion_matrix(conf_matrix,"Handwritten Data Dataset Logistic Regression")
+    confusion_matrix(conf_matrix,"Handwritten Data Dataset SVM")
 
     ROC_DET([scores],dev_labels,"Handwritten")
 

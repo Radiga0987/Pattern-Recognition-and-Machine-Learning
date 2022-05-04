@@ -1,7 +1,6 @@
 import numpy as np
-import time
 from sklearn.decomposition import PCA
-from numpy import random
+
 
 def covariance(x,u,flag_initialise=0,r_k=[],N_k=[],flag_diag=0):
     if flag_initialise==1:  #Computes the general form of Covariance Matrices
@@ -42,12 +41,6 @@ maxs=np.max(data,axis=0)
 mins = np.min(data,axis =0)
 data = (data-means)/(maxs-means)
 
-Q = pca_(data,2)
+Q = pca_(data,5)
 print(pca_transform(data,Q))
-print()
-
-pca = PCA(.99)
-pca.fit(np.array(data))
-new_data = pca.transform(data)
-print(new_data)
 

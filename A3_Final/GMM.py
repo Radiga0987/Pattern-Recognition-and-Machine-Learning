@@ -3,6 +3,8 @@ import os
 import matplotlib.pyplot as plt
 from sklearn.metrics import det_curve
 from sklearn.decomposition import PCA
+
+from sklearn.preprocessing import StandardScaler
 # Normal_distribution = norm_gaus.pdf
 
 
@@ -209,6 +211,16 @@ def confusion_matrix(conf_matrix,Title):
 
 #ROC and DET
 def ROC_DET(S_list,class_labels,Title=""):
+    temp = [] 
+
+    for score in S_list:
+        sc_x = StandardScaler()
+        score = sc_x.fit_transform(score)
+        # for i in range(len(score[0])):
+        #     sc_x = StandardScaler()
+        #     score[:,i] = sc_x.fit_transform(score[:,i])
+        temp.append(score)
+    S_list = temp
     #ROC
     Scores_list = []
     for case_no in range(len(S_list)):  #For Loop for all cases

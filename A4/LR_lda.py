@@ -12,6 +12,8 @@ from pca_lda_ import pca_,lda_,transform
 from scipy import signal
 import math
 
+import warnings
+warnings.filterwarnings("ignore")
 #Function finds the Gradient
 def gradient(X, T, W, mu):
         Z = np.dot(X,W)
