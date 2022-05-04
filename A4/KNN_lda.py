@@ -219,11 +219,10 @@ mean_train = np.mean(train_extended,axis=0)
 maxs = np.max(train_extended,axis=0)
 mins = np.min(train_extended,axis=0)
 denoms = maxs - mins
-train_all = (train_extended-mean_train)/denoms
+train_extended = (train_extended-mean_train)/denoms
 dev_extended = (dev_extended-mean_train)/denoms
 
 Q = lda_(train_extended,train_labels,.99)
-print(Q.shape)
 train_extended = transform(Q,train_extended)
 dev_extended = transform(Q,dev_extended)
 
@@ -326,7 +325,7 @@ mean_train = np.mean(train_extended,axis=0)
 maxs = np.max(train_extended,axis=0)
 mins = np.min(train_extended,axis=0)
 denoms = maxs - mins
-train_all = (train_extended-mean_train)/denoms
+train_extended = (train_extended-mean_train)/denoms
 dev_extended = (dev_extended-mean_train)/denoms
 
 Q = lda_(train_extended,train_labels,.99)
