@@ -277,7 +277,7 @@ train_imgs = np.array(train_imgs)
 dev_imgs = np.array(dev_imgs)
 
 
-KNN_Images(15,train_imgs,train_img_label,dev_imgs,dev_img_label)
+KNN_Images(10,train_imgs,train_img_label,dev_imgs,dev_img_label)
 
 
 

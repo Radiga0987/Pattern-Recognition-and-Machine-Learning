@@ -274,8 +274,8 @@ def Image_Dataset():
     sc_x = StandardScaler()    
     train_all = sc_x.fit_transform(train_all)
     dim_old = len(train_all[0])
-    Q = lda_(train_all,train_labels,99)
-    # Q = pca_(train_all,0.99)
+    # Q = lda_(train_all,train_labels,99)
+    Q = pca_(train_all,0.99)
     train_all = transform(Q,train_all)
     dim_new = len(train_all[0])
     print("Pca Transformed ",dim_old," to ",dim_new," features")
@@ -408,5 +408,5 @@ def spoken_digits():
         conf_matrix[int(dev_labels[i]-1)][int(y_pred[i]-1)] += 1
     confusion_matrix(conf_matrix,"Image Dataset Logistic Regression")
 # Synth()
-# Image_Dataset()
-spoken_digits()
+Image_Dataset()
+# spoken_digits()

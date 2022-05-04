@@ -249,15 +249,15 @@ def Image_Dataset():
     dev = (dev-mean_train)/denoms
   
     #Perform Lda
-    Q = lda_(train_all,train_labels,0.95)
+    Q = lda_(train_all,train_labels,0.99)
     train_all = transform(Q,train_all)
     dev = transform(Q,dev)
   
-    # plt.scatter(train_all[:,0], train_all[:,1], c=train_labels, edgecolor="none", alpha=0.8, cmap=plt.cm.get_cmap("viridis", 5))
-    # plt.show()
+    plt.scatter(train_all[:,0], train_all[:,1], c=train_labels, edgecolor="none", alpha=0.8, cmap=plt.cm.get_cmap("viridis", 5))
+    plt.show()
 
-    # plt.scatter(dev[:,0], dev[:,1], c=dev_labels, edgecolor="none", alpha=0.8, cmap=plt.cm.get_cmap("viridis", 5))
-    # plt.show()
+    plt.scatter(dev[:,0], dev[:,1], c=dev_labels, edgecolor="none", alpha=0.8, cmap=plt.cm.get_cmap("viridis", 5))
+    plt.show()
 
     #Normalise Data
     mean_train = np.mean(train_all,axis=0)
@@ -530,7 +530,7 @@ def Handwriting_Data():
     ROC_DET([scores],dev_labels,"Handwritten")
 
 #Logistic Regression on the datasets.
-# Synth()
+Synth()
 Image_Dataset()
 spoken_digits()
 Handwriting_Data()

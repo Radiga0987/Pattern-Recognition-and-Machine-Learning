@@ -142,7 +142,7 @@ Q = lda_(train_imgs,train_img_label,.99)
 train_imgs = transform(Q,train_imgs)
 dev_imgs = transform(Q,dev_imgs)
 
-KNN_Images(15,train_imgs,train_img_label,dev_imgs,dev_img_label)
+KNN_Images(10,train_imgs,train_img_label,dev_imgs,dev_img_label)
 
 
 
