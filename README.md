@@ -1,5 +1,5 @@
 # Pattern-Recognition-and-Machine-Learning
-This repository contains all the projects/assignments we worked on during the course on machine learning.\
+This repository contains all the projects/assignments we worked on during the course on machine learning.
 <ul>
 <li>A1 - Image compression analysis using SVD and EVD</li>
 <li>A2 - Regression and Bayes/Naive-Bayes classifiers for synthetic data</li>
